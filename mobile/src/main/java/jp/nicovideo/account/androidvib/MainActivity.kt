@@ -17,16 +17,21 @@ class MainActivity : AppCompatActivity() {
 
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         
+        var thread: PulseThread? = null
+        
         val startButton = Button(this)
         startButton.setOnClickListener {
-            PulseController().start(60, Note.Quarter, {
+            thread?.stop()
+            thread = PulseThread(60, Note.Quarter, {
                     vibrator.vibrate(100)
             })
+            thread?.start()
+            
         }
         startButton.text = "start"
 
         val stopButton = Button(this)
-        stopButton.setOnClickListener { vibrator.cancel() }
+        stopButton.setOnClickListener { thread?.stop() }
         stopButton.text = "stop"
 
         layout.addView(startButton)

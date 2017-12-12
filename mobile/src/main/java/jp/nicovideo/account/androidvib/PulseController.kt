@@ -10,32 +10,16 @@ enum class Note(val value: Double) {
 }
 
 class PulseController() {
+    private var thread: PulseThread? = null
+
     fun start(bpm: Int, note: Note, onPulse: () -> Unit) {
-        Thread(Runnable {
-            val interval = (60 / bpm * note.value * 1000 * 1000 * 1000).toLong()
-            val startTime = System.nanoTime()
-
-            var lapTime = startTime
-
-            for (i in 0..16) {
-                onPulse()
-                lapTime += interval
-                var endTime: Long
-                do {
-                    endTime = System.nanoTime()
-                    try {
-                        Thread.sleep(10)
-                    } catch (e: InterruptedException) {
-                        break
-                    }
-
-                } while (lapTime >= endTime)
-            }
-        }).start()
+        thread?.stop()
+        thread = PulseThread(bpm, note, onPulse)
+        thread?.start()
     }
 
     fun stop() {
-
+        thread?.stop()
     }
 
 }
